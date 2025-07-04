@@ -14,6 +14,7 @@ const createContact = (req, res) => {
     // console.log("the content from the user is: ",req.body);   
    try {
      const { name, email, phone } = req.body;
+    //  just testing
      if (!(name && phone && email)) {
          res.status(400);
          throw new Error("All fields a required")
