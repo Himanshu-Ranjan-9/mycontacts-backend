@@ -9,19 +9,15 @@ router.route("/")
 .get(getAllContacts)
 .post(createContact);
 
+
 router.route("/:id")
 .get(getContactById)
 .delete(deleteContactById)
 .put(updateContactById);
 
+//protected route
 
 
-// router.route("/").get(getAllContacts);
-// router.route("/").post(createContact);
-// router.route("/:id").get(getContactById);
-
-// router.route("/:id").delete(deleteContactById);
-// router.route("/:id").put(updateContactById);
 
 
 

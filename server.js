@@ -2,8 +2,10 @@ import express from "express"
 import dotenv from "dotenv"
 import testingRoutes from "./routes/testing.route.js";
 import contactsRoutes from "./routes/contacts.routes.js"
+import userRoutes from "./routes/auth.routes.js";
 import { errorhandler } from "./middleware/errorhandler.js";
 import { dbConnection } from "./config/DbConnection.config.js";
+import cookieParser from "cookie-parser";
 dotenv.config()
 
 
@@ -12,9 +14,11 @@ const port = process.env.PORT || 8081;
 
 dbConnection()
 
+app.use(cookieParser())
 app.use(express.json());
 app.use("/api/test", testingRoutes)
 app.use("/api/contacts", contactsRoutes)
+app.use("/api/user", userRoutes)
 app.use(errorhandler)
 
 app.listen(port, () => {
