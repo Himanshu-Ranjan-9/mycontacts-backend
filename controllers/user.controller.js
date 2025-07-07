@@ -5,8 +5,16 @@ import { generateToken } from "../middleware/Token.middleware.js";
 
 export const loginUser = AsyncHandler(async(req,res)=>{
     const { email, password } = req.body;
+    console.log("reqBdy-",req.body)
     const newUser = await userMamodel.findOne({email})
-    const comparePass =await bcrypt.compare(password, newUser.password)
+    if(!newUser){
+        return res.status(404)
+            .json({
+                success:false,
+                message:"user not found"
+            })
+    }
+    const comparePass =await bcrypt.compare(password, newUser?.password)
           if(!(newUser && comparePass)){
             return res.status(404)
             .json({
@@ -34,6 +42,7 @@ export const loginUser = AsyncHandler(async(req,res)=>{
 })
 
 export const registerUser = AsyncHandler(async(req,res)=>{
+     console.log("reqBdy-",req.body)
     const { name,email,password } =req.body;
     if(!(name && email && password)){
         return res.status(400)
@@ -63,6 +72,7 @@ export const registerUser = AsyncHandler(async(req,res)=>{
     newUser.__v = undefined;
     newUser.updatedAt = undefined;
     newUser.createdAt = undefined;
+    newUser.password = undefined;
     res.status(200)
         .json({
             success:true,

@@ -1,16 +1,23 @@
 import AsyncHandler from "express-async-handler"
 import contacts from "../models/contacts.model.js"
-import { constant } from "../utils/constant.js";
+import mongoose, { Schema } from "mongoose";
 
 
 const createContact = AsyncHandler(async (req, res) => {
+
     const { name, email, phone } = req.body;
-    if (!(name && phone && email)) {
+    const userid=req.user;
+    if (!(name && phone && email && userid)) {
         res.status(400);
         throw new Error("All fields a required")
     }
-    await contacts.insertOne({ name, email, phone });
-    res.status(201).json({
+    const newcontact = await contacts.insertOne({ name, email, phone , userid});
+    if(!newcontact){
+         res.status(400)
+        throw new Error("Contacts Not created")
+    }
+   return res.status(201)
+    .json({
         success: true,
         message: "Contact Added"
     })
@@ -19,18 +26,35 @@ const createContact = AsyncHandler(async (req, res) => {
 
 
 const getAllContacts = AsyncHandler(async (req, res) => {
-    const data = await contacts.find().select("-__v -updatedAt -createdAt");
-    if (data) {
-        res.status(200).json({
-            success: true,
-            message: "Contacts Fetched Succefully",
-            data: data
-        })
+  
+  const userid =req.user
+
+  const contactList = await contacts.aggregate([
+    {
+        $match:{
+            userid: new mongoose.Types.ObjectId(userid)
+        }
+    },{
+        $lookup:{
+            from:"contacts",
+            foreignField:"userId",
+            localField:"_id",
+            as:"contactList"
+        }
     }
-    else {
+  ])
+  
+    // const data = await contacts.find().select("-__v -updatedAt -createdAt");
+    if (!contactList) { 
         res.status(constant.NOT_FOUND)
         throw new Error("Contacts Not found")
     }
+    res.status(200).json({
+        success: true,
+        message: "Contacts Fetched Succefully",
+        data: contactList
+    })
+   
 })
 
 

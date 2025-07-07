@@ -6,18 +6,23 @@ import userRoutes from "./routes/auth.routes.js";
 import { errorhandler } from "./middleware/errorhandler.js";
 import { dbConnection } from "./config/DbConnection.config.js";
 import cookieParser from "cookie-parser";
+import { verifyToken } from "./middleware/Token.middleware.js";
 dotenv.config()
+
 
 
 const app = express();
 const port = process.env.PORT || 8081;
 
+
+
 dbConnection()
+
 
 app.use(cookieParser())
 app.use(express.json());
 app.use("/api/test", testingRoutes)
-app.use("/api/contacts", contactsRoutes)
+app.use("/api/contacts",verifyToken, contactsRoutes)
 app.use("/api/user", userRoutes)
 app.use(errorhandler)
 
